@@ -17,7 +17,6 @@
 
 #include <QMainWindow>
 
-#include "rx_sdrplay.h"
 #include "rx_airspy.h"
 #include "rx_plutosdr.h"
 #include "plot.h"
@@ -85,7 +84,6 @@ private:
     id_device_t id_device;
     dvbt2_frame* dvbt2;
     QThread* thread = nullptr;
-    rx_sdrplay* ptr_sdrplay;
     rx_airspy* ptr_airspy;
     rx_plutosdr* ptr_plutosdr;
     int start_sdrplay();

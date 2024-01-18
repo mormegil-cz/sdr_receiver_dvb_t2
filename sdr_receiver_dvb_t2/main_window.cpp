@@ -97,56 +97,16 @@ void main_window::on_check_box_agc_stateChanged(int arg1)
 //---------------------------------------------------------------------------------------------------------------------------------
 void main_window::open_sdrplay()
 {
-    int err;
-    char* ser_no = nullptr;
-    unsigned char hw_ver;
-    ptr_sdrplay = new rx_sdrplay;
-    err = ptr_sdrplay->get(ser_no, hw_ver);
-    ui->text_log->insertPlainText("Get SdrPlay:"  " " +
-                                  QString::fromStdString(ptr_sdrplay->error(err)) + "\n");
-    if(err !=0) return;
-
-    ui->label_name->setText("Name : SdrPlay");
-    ui->label_ser_no->setText("Serial No : " + QString::fromUtf8(ser_no));
-    ui->label_hw_ver->setText("Hardware ver : " + QString::number(hw_ver));
-    ui->label_gain->setText("gain reduction(0-85):");
-
-    id_device = id_sdrplay;
-    ui->push_button_start->setEnabled(true);
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 int main_window::start_sdrplay()
 {
-    double rf_fraquency;
-    int gain_db;
-    int err;
-    rf_fraquency = ui->line_edit_rf->text().toDouble();
-    gain_db = ui->line_edit_gain->text().toInt();
-    if(ui->check_box_agc->isChecked()) gain_db = -1;
-    err = ptr_sdrplay->init(rf_fraquency, gain_db);
-    ui->text_log->insertPlainText("Init SdrPlay:"  " "  +
-                                  QString::fromStdString(ptr_sdrplay->error(err)) + "\n");
-    if(err !=0) return err;
-
-    thread = new QThread;
-    ptr_sdrplay->moveToThread(thread);
-    connect(thread, SIGNAL(started()), ptr_sdrplay, SLOT(start()));
-    connect(this,SIGNAL(stop_device()),ptr_sdrplay,SLOT(stop()),Qt::DirectConnection);
-    connect(ptr_sdrplay, SIGNAL(finished()), ptr_sdrplay, SLOT(deleteLater()));
-    connect(ptr_sdrplay, SIGNAL(finished()), thread, SLOT(quit()),Qt::DirectConnection);
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start(QThread::TimeCriticalPriority);
-
-    connect(ptr_sdrplay, &rx_sdrplay::status, this, &main_window::status_sdrplay);
-    connect(ptr_sdrplay, &rx_sdrplay::radio_frequency, this, &main_window::radio_frequency);
-    connect(ptr_sdrplay, &rx_sdrplay::level_gain, this, &main_window::level_gain);
     return 0;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void main_window::status_sdrplay(int _err)
 {
-    ui->text_log->insertPlainText("Status SdrPlay:"  " "  +
-                                  QString::fromStdString(ptr_sdrplay->error(_err)) + "\n");
+    ui->text_log->insertPlainText("SdrPlay disabled!\n");
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void main_window::open_airspy()
@@ -269,7 +229,6 @@ void main_window::on_push_button_start_clicked()
 
         if(start_sdrplay() != 0) return;
 
-        dvbt2 = ptr_sdrplay->frame;
         break;
 
     case id_airspy:
